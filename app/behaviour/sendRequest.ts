@@ -82,6 +82,7 @@ export class GRPCRequest extends EventEmitter {
           }
         }
 
+        // @ts-ignore
         md.add(key, Buffer.from(value, encoding));
       } else {
         md.add(key, metadata[key]);
@@ -325,12 +326,12 @@ export class GRPCRequest extends EventEmitter {
     return { inputs, metadata };
   }
 
-  private emitError(serviceError: ServiceError) {
+  private emitError(serviceError: ServiceError, responseMetaInformation: {responseTime?: number, stream?: boolean}) {
     parseError(serviceError).then((errorObject) => {
-      this.emit(GRPCEventType.ERROR, errorObject)
+      this.emit(GRPCEventType.ERROR, errorObject, responseMetaInformation)
     }).catch((e) => {
       console.warn(e);
-      this.emit(GRPCEventType.ERROR, { message: serviceError.message, code: serviceError.code });
+      this.emit(GRPCEventType.ERROR, { message: serviceError.message, code: serviceError.code }, responseMetaInformation);
     });
   }
 }
